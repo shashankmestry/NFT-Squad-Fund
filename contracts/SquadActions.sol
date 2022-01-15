@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./ISquad.sol";
 
 contract SquadActions {
@@ -17,6 +18,7 @@ contract SquadActions {
 
     event SquadAdded(address indexed squadAddress);
     event SquadActivated(address indexed squadAddress);
+    event Contributed(address indexed _squadAddress, address indexed contributor, uint _amount);
 
     constructor(address _squadFactoryAddress) {
         squadFactoryAddress = _squadFactoryAddress;
@@ -40,6 +42,12 @@ contract SquadActions {
         return ISquad(_squadAddress);
     }
 
+    function getERC721Data(address _contractAddress, address _owner) public view returns (bool) {
+        IERC721 token = IERC721(_contractAddress);
+        require(token.balanceOf(_owner) > 0, "must own nft");
+        return true;
+    }
+
     function activate(address _squadAddress) public payable {
         ISquad squad = getSquad(_squadAddress);
         
@@ -55,5 +63,27 @@ contract SquadActions {
         squad.updateStatus(2);
 
         emit SquadActivated(_squadAddress);
+    }
+
+    function contribute(address _squadAddress, uint _amount) public payable {
+        
+        ISquad squad = getSquad(_squadAddress);
+        getERC721Data(squad.nftCollectionAddress(), msg.sender);
+        uint currentInvestment = squad.currentInvestment();
+        uint target = squad.maxFundSize();
+        require((currentInvestment + _amount) <= target, "target overflow");
+        SquadMeta storage squadMeta = squads[_squadAddress];
+        require(squad.maxInvestment() >= (squadMeta.investments[msg.sender] + _amount), "max investment overflow");
+        require((squadMeta.investments[msg.sender] + _amount) >= squad.minInvestment(), "min investment overflow");
+        if(squadMeta.investments[msg.sender] == 0) {
+            squadMeta.investorCount++;
+        }
+        squadMeta.investments[msg.sender] = squadMeta.investments[msg.sender] + _amount;
+        currentInvestment += _amount;
+        squad.updateCurrentInvestment(currentInvestment);
+        if(currentInvestment == target) {
+            squad.updateStatus(4);
+        }
+        emit Contributed(_squadAddress, msg.sender, _amount);
     }
 }
