@@ -6,7 +6,7 @@ import "./SquadERC20.sol";
 interface ISquad {
     function updateStatus(uint8) external;
     function updateCurrentInvestment(uint) external;
-    function updateSpadActionController(address) external;
+    function updateSquadActionController(address) external;
 
     function nftCollectionAddress() external view returns (address);
     function maxFundSize() external view returns (uint);

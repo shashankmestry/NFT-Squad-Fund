@@ -19,7 +19,7 @@ contract SquadFactory is Ownable {
 
     }
 
-    function setSpadActionAddress(address _squadActionAddress) public onlyOwner {
+    function setSquadActionAddress(address _squadActionAddress) public onlyOwner {
         squadActionAddress = _squadActionAddress;
         emit SquadActionAddressUpdated(squadActionAddress);
     }
@@ -28,7 +28,7 @@ contract SquadFactory is Ownable {
         return squads.length;
     }
 
-    function getSpadsByCreators(address _initiator) public view returns (address[] memory) {
+    function getSquadsByCreators(address _initiator) public view returns (address[] memory) {
         return initiators[_initiator];
     }
 

@@ -18,7 +18,7 @@ contract Squad {
     address squadActionAddress;
 
     event StatusUpdated(uint8 status);
-    event SpadActionControllerUpdated(address spadActionController);
+    event SquadActionControllerUpdated(address squadActionController);
     event CurrentInvestmentUpdated(uint investment);
 
     constructor(address _nftCollectionAddress, uint _maxFundSize, string memory _purpose, string memory _fundCode, address _initiator, uint _minInvestment, uint _maxInvestment, uint _totalSupply, address _squadActionAddress) {
@@ -57,9 +57,9 @@ contract Squad {
         emit CurrentInvestmentUpdated(currentInvestment);
     }
 
-    function updateSpadActionController(address _actionController) public {
+    function updateSquadActionController(address _actionController) public {
         isController();
         squadActionAddress = _actionController;
-        emit SpadActionControllerUpdated(squadActionAddress);
+        emit SquadActionControllerUpdated(squadActionAddress);
     }
 }
